@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My first three.js app</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+</head>
+<body>
+<script src="three.js"></script>
+<script src="OrbitControls.js"></script>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3">
+            <h1>Cone Parameters</h1>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Height</span>
+                </div>
+                <input type="number" class="form-control" id="coneHeight" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-default">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Radius</span>
+                </div>
+                <input type="number" class="form-control" id="coneRadius" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-default">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Segments</span>
+                </div>
+                <input type="number" class="form-control" id="coneSegments" aria-label="Sizing example input"
+                       aria-describedby="inputGroup-sizing-default">
+            </div>
+
+        </div>
+        <div class="col-9">
+            <div id="3d-model"></div>
+        </div>
+    </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
