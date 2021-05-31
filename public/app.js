@@ -1,36 +1,53 @@
-const $coneHeight = document.getElementById('coneHeight');
-const $coneRadius = document.getElementById('coneRadius');
-const $coneSegments = document.getElementById('coneSegments');
+let camera, scene, renderer, controls, geometry, coneParameters, conePoints = [];
 
-const $modelContainer = document.getElementById('3d-model');
-const width = $modelContainer.clientWidth;
-const height = window.innerHeight;
-const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-let scene = new THREE.Scene();
-const geometry = new THREE.BufferGeometry();
+init();
+animate();
 
-const coneParameters = {
-   height: null,
-   radius: null,
-   segments: null
-};
+function init() {
+   const $coneHeight = document.getElementById('coneHeight');
+   const $coneRadius = document.getElementById('coneRadius');
+   const $coneSegments = document.getElementById('coneSegments');
+   const $modelContainer = document.getElementById('3d-model');
 
-let conePoints = [];
+   const width = $modelContainer.clientWidth;
+   const height = window.innerHeight;
+   camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+   camera.lookAt(0, 0, 0);
+   camera.position.set(0, 0, 50);
 
-$coneHeight.addEventListener('change', (e) => {
-   coneParameters.height = e.target.value;
-   sendData();
-});
-$coneRadius.addEventListener('change', (e) => {
-   coneParameters.radius = e.target.value;
-   sendData();
-});
-$coneSegments.addEventListener('change', (e) => {
-   coneParameters.segments = e.target.value;
-   sendData();
-});
+   renderer = new THREE.WebGLRenderer();
+   renderer.setSize(width, height);
+   $modelContainer.appendChild(renderer.domElement);
+
+   controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+   scene = new THREE.Scene();
+   scene.background = new THREE.Color('#3e3e3e');
+
+   geometry = new THREE.BufferGeometry();
+
+   coneParameters = {
+      height: null,
+      radius: null,
+      segments: null
+   };
+
+   addLights();
+
+   $coneHeight.addEventListener('change', (e) => {
+      coneParameters.height = e.target.value;
+      sendData();
+   });
+   $coneRadius.addEventListener('change', (e) => {
+      coneParameters.radius = e.target.value;
+      sendData();
+   });
+   $coneSegments.addEventListener('change', (e) => {
+      coneParameters.segments = e.target.value;
+      sendData();
+   });
+}
+
 
 function isHaveNull(arr) {
    return Object.values(arr).includes(null);
@@ -52,22 +69,12 @@ function sendData() {
 }
 
 function viewModel(triangulation) {
-   scene.clear()
-
-   camera.lookAt(0, 0, 0);
-   camera.position.set(0, 0, 50);
-   renderer.outputEncoding = THREE.sRGBEncoding;
-   renderer.shadowMap.enabled = true;
-
-   renderer.setSize(width, height);
-   $modelContainer.appendChild(renderer.domElement);
-
-   buildConePoints(triangulation)
+   buildConePoints(triangulation);
    drawCone();
    conePoints = [];
 }
 
-function buildConePoints(triangulation){
+function buildConePoints(triangulation) {
    function isIndexExist(i) {
       return i < triangulation.Pi.length;
    }
@@ -91,8 +98,8 @@ function addPoint(...coords) {
    ]);
 }
 
-function addLights(){
-   let hemiLight = new THREE.HemisphereLight('#fff', 0x444444);
+function addLights() {
+   const hemiLight = new THREE.HemisphereLight('#fff', 0x444444);
    hemiLight.position.set(0, 0, -10);
    scene.add(hemiLight);
 
@@ -102,13 +109,7 @@ function addLights(){
    scene.add(light);
 }
 
-const animate = function () {
-   requestAnimationFrame(animate);
-   controls.update();
-   renderer.render(scene, camera);
-};
-
-function setupConeGeometry(){
+function setupConeGeometry() {
    const numVertices = conePoints.length;
    const positionNumComponents = 3;
    const positions = new Float32Array(numVertices * positionNumComponents);
@@ -120,19 +121,16 @@ function setupConeGeometry(){
       posNdx += positionNumComponents;
    });
 
-   geometry.setAttribute(
-      'position',
-      new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
+   const typedArray = new Float32Array(positions);
+   const bufferAttr = new THREE.BufferAttribute(typedArray, positionNumComponents);
+
+   geometry.setAttribute('position', bufferAttr);
 }
 
 function drawCone() {
-   scene.background = new THREE.Color('#3e3e3e');
+   setupConeGeometry();
 
-   addLights()
-   animate();
-   setupConeGeometry()
-
-   let material = new THREE.MeshStandardMaterial(
+   const material = new THREE.MeshStandardMaterial(
       {
          color: '#999',
          side: THREE.DoubleSide,
@@ -142,6 +140,10 @@ function drawCone() {
 
    const cone = new THREE.Mesh(geometry, material);
    scene.add(cone);
+}
 
+function animate() {
+   requestAnimationFrame(animate);
+   controls.update();
    renderer.render(scene, camera);
 }
