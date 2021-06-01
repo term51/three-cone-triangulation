@@ -1,4 +1,4 @@
-let camera, scene, renderer, controls, geometry, coneParameters, conePoints = [];
+let camera, scene, renderer, controls, geometry, coneParameters, conePoints = [], cone;
 
 init();
 animate();
@@ -6,7 +6,7 @@ animate();
 function init() {
    const $coneHeight = document.getElementById('coneHeight');
    const $coneRadius = document.getElementById('coneRadius');
-   const $coneSegments = document.getElementById('coneSegments');
+   const $coneSegments = document.getElementById('coneSegments');ц
    const $modelContainer = document.getElementById('3d-model');
 
    const width = $modelContainer.clientWidth;
@@ -48,6 +48,16 @@ function init() {
    });
 }
 
+function addLights() {
+   const hemiLight = new THREE.HemisphereLight('#fff', 0x444444);
+   hemiLight.position.set(0, 0, -10);
+   scene.add(hemiLight);
+
+   const light = new THREE.DirectionalLight(0xffffff, 1, 100);
+   light.position.set(10, 20, 50); //default; light shining from top
+   light.castShadow = false; // default false
+   scene.add(light);
+}
 
 function isHaveNull(arr) {
    return Object.values(arr).includes(null);
@@ -70,7 +80,11 @@ function sendData() {
 
 function viewModel(triangulation) {
    buildConePoints(triangulation);
-   drawCone();
+   if (!cone) {
+      drawCone();
+   } else {
+      setupConeGeometry();
+   }
    conePoints = [];
 }
 
@@ -98,15 +112,18 @@ function addPoint(...coords) {
    ]);
 }
 
-function addLights() {
-   const hemiLight = new THREE.HemisphereLight('#fff', 0x444444);
-   hemiLight.position.set(0, 0, -10);
-   scene.add(hemiLight);
+function drawCone() {
+   setupConeGeometry();
 
-   const light = new THREE.DirectionalLight(0xffffff, 1, 100);
-   light.position.set(10, 20, 50); //default; light shining from top
-   light.castShadow = false; // default false
-   scene.add(light);
+   const material = new THREE.MeshStandardMaterial(
+      {
+         color: '#999',
+         side: THREE.DoubleSide,
+         flatShading: true,
+      }
+   );
+   cone = new THREE.Mesh(geometry, material);
+   scene.add(cone);
 }
 
 function setupConeGeometry() {
@@ -127,23 +144,9 @@ function setupConeGeometry() {
    geometry.setAttribute('position', bufferAttr);
 }
 
-function drawCone() {
-   setupConeGeometry();
-
-   const material = new THREE.MeshStandardMaterial(
-      {
-         color: '#999',
-         side: THREE.DoubleSide,
-         flatShading: true,
-      }
-   );
-
-   const cone = new THREE.Mesh(geometry, material);
-   scene.add(cone);
-}
-
 function animate() {
    requestAnimationFrame(animate);
    controls.update();
    renderer.render(scene, camera);
 }
+
