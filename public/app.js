@@ -6,7 +6,7 @@ animate();
 function init() {
    const $coneHeight = document.getElementById('coneHeight');
    const $coneRadius = document.getElementById('coneRadius');
-   const $coneSegments = document.getElementById('coneSegments');ц
+   const $coneSegments = document.getElementById('coneSegments');
    const $modelContainer = document.getElementById('3d-model');
 
    const width = $modelContainer.clientWidth;
@@ -14,7 +14,7 @@ function init() {
    camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
    camera.lookAt(0, 0, 0);
    camera.position.set(0, 0, 50);
-
+ 
    renderer = new THREE.WebGLRenderer();
    renderer.setSize(width, height);
    $modelContainer.appendChild(renderer.domElement);
